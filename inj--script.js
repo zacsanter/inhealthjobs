@@ -20,42 +20,45 @@ function displayResponse(response) {
   setTimeout(() => {
     let audioQueue = [];
 
-    if (response) {
-      response.forEach((item, index) => {
-        const delay = index * 1000; // 1 second delay for each item
+     if (response) {
+      response.forEach((item) => {
+        
+    if (item.type === "speak" || item.type === "text") {
+        console.info("Speak/Text Step");
 
-        if (item.type === "speak" || item.type === "text") {
-          console.info("Speak/Text Step");
+        const taglineElement = document.createElement("div");
+taglineElement.classList.add("assistanttagline");
+taglineElement.textContent = "InHealth Jobs";
+chatWindow.appendChild(taglineElement);
 
-          const taglineElement = document.createElement("div");
-          taglineElement.classList.add("assistanttagline");
-          taglineElement.textContent = "InHealth Jobs";
+const assistantWrapper = document.createElement("div");
+assistantWrapper.classList.add("assistantwrapper");
 
-          const assistantWrapper = document.createElement("div");
-          assistantWrapper.classList.add("assistantwrapper");
+const assistantImage = document.createElement("div");
+assistantImage.classList.add("assistantimage");
+assistantWrapper.appendChild(assistantImage);
 
-          const assistantImage = document.createElement("div");
-          assistantImage.classList.add("assistantimage");
-          assistantWrapper.appendChild(assistantImage);
+const messageElement = document.createElement("div");
+messageElement.classList.add("message", "assistant");
+assistantWrapper.appendChild(messageElement);
+    
+messageElement.classList.add("message", "assistant");
+        
+        // Extract the 'message' field, split it into paragraphs and wrap each in <p></p> tags
+        const paragraphs = item.payload.message.split("\n\n");
+        const wrappedMessage = paragraphs.map(para => `<p>${para}</p>`).join("");
+        
+        messageElement.innerHTML = wrappedMessage;
+        chatWindow.appendChild(assistantWrapper);
 
-          const messageElement = document.createElement("div");
-          messageElement.classList.add("message", "assistant");
-          assistantWrapper.appendChild(messageElement);
+          // Save messages to local storage
 
-          const paragraphs = item.payload.message.split("\n\n");
-          const wrappedMessage = paragraphs.map(para => `<p>${para}</p>`).join("");
-          
-          messageElement.innerHTML = wrappedMessage;
-
-          setTimeout(() => {
-            chatWindow.appendChild(taglineElement);
-            chatWindow.appendChild(assistantWrapper);
-          }, delay); 
-
+          // Add audio to the queue
           if (item.payload.src) {
             audioQueue.push(item.payload.src);
           }
         } else if (item.type === "choice") {
+          // Handle 'choice' type items to render buttons
           const buttonContainer = document.createElement("div");
           buttonContainer.classList.add("buttoncontainer");
 
@@ -64,18 +67,13 @@ function displayResponse(response) {
             buttonElement.classList.add("assistant", "message", "button");
             buttonElement.textContent = button.name;
             buttonElement.dataset.key = button.request.type;
+            // Add event listener for button click
             buttonElement.addEventListener("click", (event) => {
               handleButtonClick(event);
             });
-
-            setTimeout(() => {
-              buttonContainer.appendChild(buttonElement);
-            }, delay);
+            buttonContainer.appendChild(buttonElement);
           });
-
-          setTimeout(() => {
-            chatWindow.appendChild(buttonContainer);
-          }, delay);
+          chatWindow.appendChild(buttonContainer);
         } else if (item.type === "visual") {
           console.info("Image Step");
 
@@ -83,24 +81,25 @@ function displayResponse(response) {
           imageElement.src = item.payload.image;
           imageElement.alt = "Assistant Image";
           imageElement.style.width = "100%";
-
-          setTimeout(() => {
-            chatWindow.appendChild(imageElement);
-          }, delay);
+          chatWindow.appendChild(imageElement);
         }
         localStorage.setItem("messages", chatWindow.innerHTML);
+
       });
     }
 
     typingIndicator.classList.add("hidden");
 
+    // Ensure the chat window scrolls to the latest message
     window.requestAnimationFrame(() => {
       setTimeout(() => {
         chatWindow.scrollTop = chatWindow.scrollHeight;
       }, 100);
     });
 
+    // Fade in new content
     responseContainer.style.opacity = "1";
+    // Function to play audio sequentially
     function playNextAudio() {
       if (audioQueue.length === 0) {
         // Set focus back to the input field after all audios are played
