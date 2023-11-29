@@ -129,7 +129,7 @@ function checkAndDisplayLocationContainer() {
     assistantMessages.forEach(messageDiv => {
         const paragraphs = messageDiv.querySelectorAll('p');
         paragraphs.forEach(p => {
-            if (p.textContent.includes('Here are my top 3 recommendations for states to practice:')) {
+            if (p.textContent.startsWith('Here are my top 3 recommendations')) {
                 var locationContainer = document.getElementById('location-container');
                 if (locationContainer) {
                     locationContainer.style.display = 'block';
