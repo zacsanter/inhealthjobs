@@ -6,6 +6,7 @@ const voiceflowVersionID =
   "production";
 const voiceflowAPIKey = "VF.DM.654adda68fcc81000848a925.oW1MZ5jmxrc0vIqS";
 
+    
 
 const chatWindow = document.getElementById("chat-window");
 const input = document.getElementById("user-input");
@@ -15,6 +16,11 @@ const inputFieldContainer = document.getElementById("input-container");
 const savedMessages = localStorage.getItem("messages");
 const chatContainer = document.getElementById("chat-container");
 const restartButton = document.getElementById("restart-button");
+
+var locationContainer = document.getElementById('location-container');
+    if (locationContainer) {
+        locationContainer.style.display = 'none';
+    };
 
 function displayResponse(response) {
     setTimeout(() => {
