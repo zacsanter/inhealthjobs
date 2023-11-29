@@ -22,15 +22,6 @@ function displayResponse(response) {
 
      if (response) {
       response.forEach((item) => {
-
-        // New functionality: Show 'location-container' and append it to 'chat-window'
-        if (item.type === "text" && item.payload.message.includes("Here are my top 3 recommendations for states to practice")) {
-            var locationContainer = document.getElementById('location-container');
-            if (locationContainer) {
-                locationContainer.style.display = 'block'; // Show the element
-                chatWindow.appendChild(locationContainer); // Append to chat window
-            }
-        }
         
     if (item.type === "speak" || item.type === "text") {
         console.info("Speak/Text Step");
@@ -96,6 +87,16 @@ messageElement.classList.add("message", "assistant");
 
       });
     }
+     // New functionality: Check for specific message and show 'location-container'
+    const messages = document.querySelectorAll('.message.assistant');
+    messages.forEach(message => {
+      if (message.textContent.includes('Here are my top 3 recommendations for states to practice:')) {
+        var locationContainer = document.getElementById('location-container');
+        if (locationContainer) {
+          locationContainer.style.display = 'block'; // Show the element
+          message.insertAdjacentElement('afterend', locationContainer); // Insert after the message
+        }
+      }});
 
     typingIndicator.classList.add("hidden");
 
@@ -369,6 +370,7 @@ function handleButtonClick(event) {
     });
   // Send the button label as input to the API and handle the response
 }
+
 
 
 
