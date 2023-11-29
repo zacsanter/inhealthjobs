@@ -22,6 +22,15 @@ function displayResponse(response) {
 
      if (response) {
       response.forEach((item) => {
+
+        // New functionality: Show 'location-container' and append it to 'chat-window'
+        if (item.type === "text" && item.payload.message.includes("Here are my top 3 recommendations for states to practice")) {
+            var locationContainer = document.getElementById('location-container');
+            if (locationContainer) {
+                locationContainer.style.display = 'block'; // Show the element
+                chatWindow.appendChild(locationContainer); // Append to chat window
+            }
+        }
         
     if (item.type === "speak" || item.type === "text") {
         console.info("Speak/Text Step");
