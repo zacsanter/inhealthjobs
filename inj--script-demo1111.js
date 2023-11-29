@@ -175,15 +175,19 @@ document.addEventListener("DOMContentLoaded", (event) => {
   if (!savedMessages) {
     interact("#launch#");
   }
-  // Select the restart button
-  // Add click event listener to the restart button
   restartButton.addEventListener("click", () => {
     // Clear chat window and local storage
     chatWindow.innerHTML = "";
     localStorage.removeItem("messages");
+
+    // Reset location-container to hidden
+    if (locationContainer) {
+        locationContainer.style.display = 'none';
+    }
+
     // Initiate new chat
     interact("#launch#");
-  });
+});
   inputFieldContainer.addEventListener("click", () => {
     input.focus();
   });
