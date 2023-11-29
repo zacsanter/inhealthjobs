@@ -136,7 +136,6 @@ function checkAndDisplayLocationContainer() {
                 var locationContainer = document.getElementById('location-container');
                 if (locationContainer) {
                     locationContainer.style.display = 'block';
-                    // If you need to place location-container in a specific position relative to messageDiv
                     messageDiv.parentNode.insertAdjacentElement('afterend', locationContainer);
                 }
             }
@@ -179,6 +178,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     var locationContainer = document.getElementById('location-container');
     if (locationContainer) {
         locationContainer.style.display = 'none';
+        document.body.insertBefore(locationContainer, document.body.firstChild);
     }
 
     interact("#launch#");
