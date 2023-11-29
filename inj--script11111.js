@@ -133,7 +133,7 @@ function checkAndDisplayLocationContainer() {
                 var locationContainer = document.getElementById('location-container');
                 if (locationContainer) {
                     locationContainer.style.display = 'block';
-                    messageDiv.insertAdjacentElement('afterend', locationContainer);
+                    messageDiv.parentNode.insertAdjacentElement('afterend', locationContainer);
                 }
             }
         });
