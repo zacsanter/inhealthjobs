@@ -180,9 +180,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
     chatWindow.innerHTML = "";
     localStorage.removeItem("messages");
 
-    // Reset location-container to hidden
+    // Reset location-container to hidden and possibly move it back to its original position
+    var locationContainer = document.getElementById('location-container');
     if (locationContainer) {
         locationContainer.style.display = 'none';
+        // If necessary, move locationContainer back to its original position in the DOM
+        // For example:
+        // originalParentElement.appendChild(locationContainer);
     }
 
     // Initiate new chat
