@@ -133,12 +133,11 @@ function checkAndDisplayLocationContainer() {
         const paragraphs = messageDiv.querySelectorAll('p');
         paragraphs.forEach(p => {
             if (p.textContent.startsWith('Here are my top 3 recommendations')) {
-                var originalLocationContainer = document.getElementById('location-container');
-                if (originalLocationContainer) {
-                    var clone = originalLocationContainer.cloneNode(true); // deep clone
-                    clone.style.display = 'block'; // make the clone visible
-                    clone.id = ''; // remove id to avoid duplicate IDs
-                    messageDiv.parentNode.insertAdjacentElement('afterend', clone);
+                var locationContainer = document.getElementById('location-container');
+                if (locationContainer) {
+                    locationContainer.style.display = 'block';
+                    // If you need to place location-container in a specific position relative to messageDiv
+                    messageDiv.parentNode.insertAdjacentElement('afterend', locationContainer);
                 }
             }
         });
@@ -176,6 +175,11 @@ document.addEventListener("DOMContentLoaded", (event) => {
  restartButton.addEventListener("click", () => {
     chatWindow.innerHTML = "";
     localStorage.removeItem("messages");
+
+    var locationContainer = document.getElementById('location-container');
+    if (locationContainer) {
+        locationContainer.style.display = 'none';
+    }
 
     interact("#launch#");
 });
