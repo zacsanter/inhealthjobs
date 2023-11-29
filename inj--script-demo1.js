@@ -130,6 +130,7 @@ function displayResponse(response) {
     }, 200);
 }
 
+
 function checkAndDisplayLocationContainer() {
     const assistantMessages = document.querySelectorAll('.message.assistant');
     assistantMessages.forEach(messageDiv => {
