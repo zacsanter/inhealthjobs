@@ -21,7 +21,8 @@ function displayResponse(response) {
     let audioQueue = [];
 
      if (response) {
-      response.forEach((item) => {
+            // Process each item in the response
+            response.forEach((item, index, array) => {
         
     if (item.type === "speak" || item.type === "text") {
         console.info("Speak/Text Step");
