@@ -17,151 +17,124 @@ const chatContainer = document.getElementById("chat-container");
 const restartButton = document.getElementById("restart-button");
 
 function displayResponse(response) {
-  setTimeout(() => {
-    let audioQueue = [];
+    setTimeout(() => {
+        let audioQueue = [];
 
-     if (response) {
-            // Process each item in the response
+        if (response) {
             response.forEach((item, index, array) => {
-        
-    if (item.type === "speak" || item.type === "text") {
-        console.info("Speak/Text Step");
+                if (item.type === "speak" || item.type === "text") {
+                    console.info("Speak/Text Step");
 
-        const taglineElement = document.createElement("div");
-taglineElement.classList.add("assistanttagline");
-taglineElement.textContent = "InHealth Jobs";
-chatWindow.appendChild(taglineElement);
+                    const taglineElement = document.createElement("div");
+                    taglineElement.classList.add("assistanttagline");
+                    taglineElement.textContent = "InHealth Jobs";
+                    chatWindow.appendChild(taglineElement);
 
-const assistantWrapper = document.createElement("div");
-assistantWrapper.classList.add("assistantwrapper");
+                    const assistantWrapper = document.createElement("div");
+                    assistantWrapper.classList.add("assistantwrapper");
 
-const assistantImage = document.createElement("div");
-assistantImage.classList.add("assistantimage");
-assistantWrapper.appendChild(assistantImage);
+                    const assistantImage = document.createElement("div");
+                    assistantImage.classList.add("assistantimage");
+                    assistantWrapper.appendChild(assistantImage);
 
-const messageElement = document.createElement("div");
-messageElement.classList.add("message", "assistant");
-assistantWrapper.appendChild(messageElement);
-    
-messageElement.classList.add("message", "assistant");
-        
-        // Extract the 'message' field, split it into paragraphs and wrap each in <p></p> tags
-        const paragraphs = item.payload.message.split("\n\n");
-        const wrappedMessage = paragraphs.map(para => `<p>${para}</p>`).join("");
-        
-        messageElement.innerHTML = wrappedMessage;
-        chatWindow.appendChild(assistantWrapper);
+                    const messageElement = document.createElement("div");
+                    messageElement.classList.add("message", "assistant");
+                    assistantWrapper.appendChild(messageElement);
 
-          // Save messages to local storage
+                    const paragraphs = item.payload.message.split("\n\n");
+                    const wrappedMessage = paragraphs.map(para => `<p>${para}</p>`).join("");
+                    
+                    messageElement.innerHTML = wrappedMessage;
+                    chatWindow.appendChild(assistantWrapper);
 
-          // Add audio to the queue
-          if (item.payload.src) {
-            audioQueue.push(item.payload.src);
-          }
-        } else if (item.type === "choice") {
-          // Handle 'choice' type items to render buttons
-          const buttonContainer = document.createElement("div");
-          buttonContainer.classList.add("buttoncontainer");
+                    if (item.payload.src) {
+                        audioQueue.push(item.payload.src);
+                    }
+                } else if (item.type === "choice") {
+                    const buttonContainer = document.createElement("div");
+                    buttonContainer.classList.add("buttoncontainer");
 
-          item.payload.buttons.forEach((button) => {
-            const buttonElement = document.createElement("button");
-            buttonElement.classList.add("assistant", "message", "button");
-            buttonElement.textContent = button.name;
-            buttonElement.dataset.key = button.request.type;
-            // Add event listener for button click
-            buttonElement.addEventListener("click", (event) => {
-              handleButtonClick(event);
+                    item.payload.buttons.forEach((button) => {
+                        const buttonElement = document.createElement("button");
+                        buttonElement.classList.add("assistant", "message", "button");
+                        buttonElement.textContent = button.name;
+                        buttonElement.dataset.key = button.request.type;
+                        buttonElement.addEventListener("click", (event) => {
+                            handleButtonClick(event);
+                        });
+                        buttonContainer.appendChild(buttonElement);
+                    });
+                    chatWindow.appendChild(buttonContainer);
+                } else if (item.type === "visual") {
+                    console.info("Image Step");
+
+                    const imageElement = document.createElement("img");
+                    imageElement.src = item.payload.image;
+                    imageElement.alt = "Assistant Image";
+                    imageElement.style.width = "100%";
+                    chatWindow.appendChild(imageElement);
+                }
+                localStorage.setItem("messages", chatWindow.innerHTML);
+
+                // After processing the last item, check for the specific message
+                if (index === array.length - 1) {
+                    checkAndDisplayLocationContainer();
+                }
             });
-            buttonContainer.appendChild(buttonElement);
-          });
-          chatWindow.appendChild(buttonContainer);
-        } else if (item.type === "visual") {
-          console.info("Image Step");
-
-          const imageElement = document.createElement("img");
-          imageElement.src = item.payload.image;
-          imageElement.alt = "Assistant Image";
-          imageElement.style.width = "100%";
-          chatWindow.appendChild(imageElement);
         }
-        localStorage.setItem("messages", chatWindow.innerHTML);
 
-      });
-    }
-     // New functionality: Check for specific message and show 'location-container'
-    const messages = document.querySelectorAll('.message.assistant');
-    messages.forEach(message => {
-      if (message.textContent.includes('Here are my top 3 recommendations for states to practice:')) {
-        var locationContainer = document.getElementById('location-container');
-        if (locationContainer) {
-          locationContainer.style.display = 'block'; // Show the element
-          message.insertAdjacentElement('afterend', locationContainer); // Insert after the message
+        typingIndicator.classList.add("hidden");
+
+        window.requestAnimationFrame(() => {
+            setTimeout(() => {
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }, 100);
+        });
+
+        responseContainer.style.opacity = "1";
+
+        function playNextAudio() {
+            if (audioQueue.length === 0) {
+                // Logic when audio queue is empty...
+                return;
+            }
+            const audioSrc = audioQueue.shift();
+            let audio = new Audio(audioSrc);
+            audio.addEventListener("canplaythrough", () => {
+                audio.play();
+            });
+            audio.addEventListener("ended", () => {
+                playNextAudio();
+            });
+            audio.addEventListener("error", () => {
+                console.error("Error playing audio:", audio.error);
+                playNextAudio();
+            });
         }
-      }});
-
-    typingIndicator.classList.add("hidden");
-
-    // Ensure the chat window scrolls to the latest message
-    window.requestAnimationFrame(() => {
-      setTimeout(() => {
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-      }, 100);
-    });
-
-    // Fade in new content
-    responseContainer.style.opacity = "1";
-    // Function to play audio sequentially
-    function playNextAudio() {
-      if (audioQueue.length === 0) {
-        // Set focus back to the input field after all audios are played
-        instance.stop();
-        input.blur();
-        setTimeout(() => {
-          input.focus();
-        }, 100);
-        return;
-      }
-      const audioSrc = audioQueue.shift();
-      audio = new Audio(audioSrc);
-      // Find and show the corresponding text
-      const textElement = responseContainer.querySelector(
-        `[data-src="${audioSrc}"]`
-      );
-      if (textElement) {
-        // Change the opacity of previous text
-        const previousTextElement = textElement.previousElementSibling;
-        if (previousTextElement && previousTextElement.tagName === "P") {
-          previousTextElement.style.opacity = "0.5";
-        }
-        // Show the current text
-        textElement.style.transition = "opacity 0.5s";
-        textElement.style.opacity = "1";
-      }
-      audio.addEventListener("canplaythrough", () => {
-        audio.play();
-      });
-      audio.addEventListener("ended", () => {
         playNextAudio();
-      });
-      // Handle errors
-      audio.addEventListener("error", () => {
-        console.error("Error playing audio:", audio.error);
-        playNextAudio(); // Skip the current audio and continue with the next one
-      });
-    }
-    // Start playing audios sequentially
-    playNextAudio();
-  }, 250);
-  setTimeout(() => {
-    // Re-enable input field and remove focus
-    input.disabled = false;
-    input.value = "";
-    input.classList.remove("fade-out");
-    input.blur();
-    input.focus();
-    // Scroll to the bottom of the chat window
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-  }, 200);
+    }, 250);
+
+    setTimeout(() => {
+        input.disabled = false;
+        input.value = "";
+        input.classList.remove("fade-out");
+        input.blur();
+        input.focus();
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }, 200);
+}
+
+function checkAndDisplayLocationContainer() {
+    const messages = document.querySelectorAll('.message.assistant p');
+    messages.forEach(p => {
+        if (p.textContent.includes('Here are my top 3 recommendations for states to practice:')) {
+            var locationContainer = document.getElementById('location-container');
+            if (locationContainer) {
+                locationContainer.style.display = 'block';
+                p.parentNode.insertAdjacentElement('afterend', locationContainer);
+            }
+        }
+    });
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
