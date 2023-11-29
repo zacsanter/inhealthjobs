@@ -17,10 +17,6 @@ const savedMessages = localStorage.getItem("messages");
 const chatContainer = document.getElementById("chat-container");
 const restartButton = document.getElementById("restart-button");
 
-var locationContainer = document.getElementById('location-container');
-    if (locationContainer) {
-        locationContainer.style.display = 'none';
-    };
 
 function displayResponse(response) {
     setTimeout(() => {
@@ -137,10 +133,12 @@ function checkAndDisplayLocationContainer() {
         const paragraphs = messageDiv.querySelectorAll('p');
         paragraphs.forEach(p => {
             if (p.textContent.startsWith('Here are my top 3 recommendations')) {
-                var locationContainer = document.getElementById('location-container');
-                if (locationContainer) {
-                    locationContainer.style.display = 'block';
-                    messageDiv.parentNode.insertAdjacentElement('afterend', locationContainer);
+                var originalLocationContainer = document.getElementById('location-container');
+                if (originalLocationContainer) {
+                    var clone = originalLocationContainer.cloneNode(true); // deep clone
+                    clone.style.display = 'block'; // make the clone visible
+                    clone.id = ''; // remove id to avoid duplicate IDs
+                    messageDiv.parentNode.insertAdjacentElement('afterend', clone);
                 }
             }
         });
@@ -175,21 +173,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
   if (!savedMessages) {
     interact("#launch#");
   }
-  restartButton.addEventListener("click", () => {
-    // Clear chat window and local storage
+ restartButton.addEventListener("click", () => {
     chatWindow.innerHTML = "";
     localStorage.removeItem("messages");
 
-    // Reset location-container to hidden and possibly move it back to its original position
-    var locationContainer = document.getElementById('location-container');
-    if (locationContainer) {
-        locationContainer.style.display = 'none';
-        // If necessary, move locationContainer back to its original position in the DOM
-        // For example:
-        // originalParentElement.appendChild(locationContainer);
-    }
-
-    // Initiate new chat
     interact("#launch#");
 });
   inputFieldContainer.addEventListener("click", () => {
