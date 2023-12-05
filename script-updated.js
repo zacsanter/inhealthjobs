@@ -446,7 +446,7 @@ function addUserMsg(userInput) {
 
 function createForm(dataObject) {
   const form = document.createElement("form");
-  form.classList.add("userDetailsForm");
+  form.classList.add("userdetailsform");
 
   for (const key in dataObject) {
     if (dataObject.hasOwnProperty(key)) {
