@@ -453,7 +453,7 @@ function createForm(dataObject) {
       const label = document.createElement("label");
       label.textContent =
         key.charAt(0).toUpperCase() + key.slice(1).replaceAll("_", " "); // Capitalize the first letter
-      label.classList.add("userDetailsFormLabel");
+      label.classList.add("userdetailsformlabel");
       label.htmlFor = 'userDetailsFormInput';
 
       const input = document.createElement("input");
@@ -461,7 +461,7 @@ function createForm(dataObject) {
       input.setAttribute("name", key);
       input.setAttribute("value", dataObject[key]);
       input.setAttribute("required", "true");
-      input.classList.add("userDetailsFormInput", "w-input");
+      input.classList.add("userdetailsforminput", "w-input");
 
 
       form.appendChild(label);
