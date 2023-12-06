@@ -518,7 +518,7 @@ function updateData(formData) {
       customFields,
     });
     updateTextContent(customFields);
-    document.querySelector(".userDetailsForm").parentElement.parentElement.remove();
+    document.querySelector(".userdetailsform").parentElement.parentElement.remove();
     localStorage.setItem("messages", chatWindow.innerHTML);
     interact({ type: "done", payload: null });
 
