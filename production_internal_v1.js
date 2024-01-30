@@ -6,7 +6,9 @@ const voiceflowRuntime = "general-runtime.voiceflow.com";
 const voiceflowVersionID =
   document.getElementById("vfassistant").getAttribute("data-version") ||
   "production";
-const voiceflowAPIKey = "VF.DM.65ae890882dc5400075b6ed9.J2ojzZa3IvxDO2PO"; //Production Internal
+  const voiceflowAPIKey = "VF.DM.65ae890882dc5400075b6ed9.J2ojzZa3IvxDO2PO"; //Production Internal
+  const voiceflowProjectID = "658b530fbaf097cb1c85fb97"; //Production Internal
+
 
 // Function to remove quotation marks from a string
 function removeQuotes(string) {
@@ -352,6 +354,23 @@ function showOverlay() {
 function hideOverlay() {
   document.querySelector('div.overlay').classList.add("hidden");
 }
+function createTranscript(){
+  const options = {
+    method: 'PUT',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      Authorization: voiceflowAPIKey,
+      versionID: voiceflowVersionID,
+    },
+    body: JSON.stringify({projectID: voiceflowProjectID, versionID: voiceflowVersionID, sessionID: uniqueId})
+  };
+  
+  fetch('https://api.voiceflow.com/v2/transcripts', options)
+    .then(response => response.json())
+    .then(response => console.log(response))
+    .catch(err => console.error(err));
+}
 async function interact(action) {
   showOverlay();
 
@@ -390,7 +409,11 @@ async function interact(action) {
   })
     .then((response) => response.json())
     .then((data) => {
+      if(action == '#launch'){
+        createTranscript();
+      }
       displayResponse(data);
+
     })
     .catch((err) => {
       displayResponse(null);
