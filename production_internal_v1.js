@@ -10,30 +10,8 @@ const voiceflowAPIKey = "VF.DM.65ae890882dc5400075b6ed9.J2ojzZa3IvxDO2PO"; //Pro
 
 // Function to remove quotation marks from a string
 function removeQuotes(string) {
-  return string.replace(/^"|"$/g, '');
+  return string.replace(/^"|"$/g, "");
 }
-
-// Retrieve values from local storage and remove quotation marks
-const firstName = removeQuotes(localStorage.getItem('first_name') || '"DefaultFirstName"');
-const lastName = removeQuotes(localStorage.getItem('last_name') || '"DefaultLastName"');
-const specialty = removeQuotes(localStorage.getItem('Specialty') || '"DefaultSpecialty"');
-
-// Prepare the options for the fetch request
-const options = {
-  method: 'PATCH',
-  headers: {
-    accept: 'application/json',
-    'content-type': 'application/json',
-    Authorization: voiceflowAPIKey
-  },
-  body: JSON.stringify({ first_name: firstName, last_name: lastName, specialty: specialty })
-};
-
-// Make the fetch request to Voiceflow
-fetch(`https://${voiceflowRuntime}/state/user/${uniqueId}/variables`, options)
-  .then(response => response.json())
-  .then(response => console.log(response))
-  .catch(err => console.error(err));
 
 const chatWindow = document.getElementById("chat-window");
 const input = document.getElementById("user-input");
@@ -48,23 +26,26 @@ const mapbox_API =
   "pk.eyJ1IjoiZGFiZWVyIiwiYSI6ImNscThhc3BubDFiNjQyanBhd2Q2eHE4cHcifQ.3PPCEJKPUyQN_2qrMzSV2w";
 let uppy;
 mapboxgl.accessToken = mapbox_API;
-var map_gl_1 = new mapboxgl.Map({ container: "map_1" }), map_gl_2 = new mapboxgl.Map({ container: "map_2" }), map_gl_3 = new mapboxgl.Map({ container: "map_3" });
-var bounds_gl_1 = new mapboxgl.LngLatBounds(), bounds_gl_2 = new mapboxgl.LngLatBounds(), bounds_gl_3 = new mapboxgl.LngLatBounds();
+var map_gl_1 = new mapboxgl.Map({ container: "map_1" }),
+  map_gl_2 = new mapboxgl.Map({ container: "map_2" }),
+  map_gl_3 = new mapboxgl.Map({ container: "map_3" });
+var bounds_gl_1 = new mapboxgl.LngLatBounds(),
+  bounds_gl_2 = new mapboxgl.LngLatBounds(),
+  bounds_gl_3 = new mapboxgl.LngLatBounds();
 const assistantTag = "InHealth Jobs",
   userTag = "You";
 
-(function() {
-    // Wait for a brief moment to ensure all elements are loaded
-    setTimeout(function() {
-        const restartButton = document.getElementById('restart-button');
-        if (restartButton) {
-            restartButton.click();
-        } else {
-            console.log('Restart button not found');
-        }
-    }, 50); // The delay in milliseconds (500ms in this case)
+(function () {
+  // Wait for a brief moment to ensure all elements are loaded
+  setTimeout(function () {
+    const restartButton = document.getElementById("restart-button");
+    if (restartButton) {
+      restartButton.click();
+    } else {
+      console.log("Restart button not found");
+    }
+  }, 50); // The delay in milliseconds (500ms in this case)
 })();
-
 
 function displayResponse(response) {
   setTimeout(() => {
@@ -203,6 +184,38 @@ function displayResponse(response) {
   }, 200);
 }
 
+async function updateVariablesinVF(){
+const data = await $memberstackDom.getCurrentMember()
+
+// Retrieve values from local storage and remove quotation marks
+const firstName = data.data.customFields['first-name'];
+const lastName = data.data.customFields['last-name'];
+const specialty = data.data.customFields['speciality'];
+const currentState = data.data.customFields['current-state'];
+
+// Prepare the options for the fetch request
+const options = {
+  method: "PATCH",
+  headers: {
+    accept: "application/json",
+    "content-type": "application/json",
+    Authorization: voiceflowAPIKey,
+  },
+  body: JSON.stringify({
+    first_name: firstName,
+    last_name: lastName,
+    specialty: specialty,
+    current_state: currentState
+  }),
+};
+
+// Make the fetch request to Voiceflow
+await fetch(`https://${voiceflowRuntime}/state/user/${uniqueId}/variables`, options)
+  .then((response) => response.json())
+  .then((response) => console.log(response))
+  .catch((err) => console.error(err));
+
+}
 function checkAndDisplayLocationContainer() {
   const assistantMessages = document.querySelectorAll(".message.assistant");
   assistantMessages.forEach((messageDiv) => {
@@ -330,8 +343,17 @@ function generateUniqueId() {
   const uniqueId = randomStr + dateTimeStrWithoutSeparators;
   return uniqueId;
 }
+function showOverlay() {
+  document.querySelector('div.overlay').classList.remove("hidden");
+}
+
+function hideOverlay() {
+  document.querySelector('div.overlay').classList.add("hidden");
+}
 
 async function interact(action) {
+  showOverlay();
+
   // Show the typing indicator before sending the message
   if (typingIndicator) {
     typingIndicator.style.display = "flex";
@@ -353,6 +375,7 @@ async function interact(action) {
       config: { tts: true, stripSSML: true },
       action: { type: "launch" },
     };
+    await updateVariablesinVF();
   }
 
   fetch(`https://${voiceflowRuntime}/state/user/${uniqueId}/interact/`, {
@@ -370,6 +393,8 @@ async function interact(action) {
     })
     .catch((err) => {
       displayResponse(null);
+    }).finally(()=>{
+      hideOverlay();
     });
 }
 
@@ -657,18 +682,28 @@ function updateLocationCards(stateData) {
     ) {
       // jQuery(modalId).find(".hosp_map");
       // window[`map_${index + 1}`];
-        stateInfo.hospitalsByState.HospitalDetails.forEach((hospital) => {         
-        //   console.log([hospital.fields.Longitude, hospital.fields.Latitude]) 
-          new mapboxgl.Marker()
+      stateInfo.hospitalsByState.HospitalDetails.forEach((hospital) => {
+        //   console.log([hospital.fields.Longitude, hospital.fields.Latitude])
+        new mapboxgl.Marker()
           .setLngLat([hospital.fields.Longitude, hospital.fields.Latitude])
-          .setPopup(new mapboxgl.Popup().setHTML(`<span class='hosp_name'>${hospital.fields["Hospital Name"]}<br><a href="${hospital.URL}">Visit Site</a></span`)) // add popup
+          .setPopup(
+            new mapboxgl.Popup().setHTML(
+              `<span class='hosp_name'>${hospital.fields["Hospital Name"]}<br><a href="${hospital.URL}">Visit Site</a></span`
+            )
+          ) // add popup
           .addTo(window[`map_gl_${index + 1}`]);
-          window[`bounds_gl_${index + 1}`].extend([hospital.fields.Longitude, hospital.fields.Latitude]);
-        });
-        window[`map_gl_${index + 1}`].fitBounds(window[`bounds_gl_${index + 1}`], {
-          padding: { top: 50, bottom: 50, left: 50, right: 50 },
-          maxZoom: 15
+        window[`bounds_gl_${index + 1}`].extend([
+          hospital.fields.Longitude,
+          hospital.fields.Latitude,
+        ]);
       });
+      window[`map_gl_${index + 1}`].fitBounds(
+        window[`bounds_gl_${index + 1}`],
+        {
+          padding: { top: 50, bottom: 50, left: 50, right: 50 },
+          maxZoom: 15,
+        }
+      );
     }
   });
 
