@@ -150,7 +150,7 @@ function displayResponse(response) {
               proudlyDisplayPoweredByUppy: false,
             })
             .use(Uppy.XHRUpload, {
-              endpoint: "https://inj-cv-parser.adabeer445.repl.co/extract_text",
+              endpoint: "https://ihj-cv-parser.replit.app/extract_text",
               fieldName: "file",
             });
           uppy.on("upload-success", async (file, response) => {
