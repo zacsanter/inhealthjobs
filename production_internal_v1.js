@@ -344,14 +344,14 @@ function generateUniqueId() {
   return uniqueId;
 }
 
-function hideOverlay() {
-  document.querySelector('div.overlay').classList.add("hidden");
-}
 
 function showOverlay() {
   document.querySelector('div.overlay').classList.remove("hidden");
 }
 
+function hideOverlay() {
+  document.querySelector('div.overlay').classList.add("hidden");
+}
 async function interact(action) {
   showOverlay();
 
