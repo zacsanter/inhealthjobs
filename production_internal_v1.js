@@ -343,12 +343,13 @@ function generateUniqueId() {
   const uniqueId = randomStr + dateTimeStrWithoutSeparators;
   return uniqueId;
 }
-function showOverlay() {
-  document.querySelector('div.overlay').classList.remove("hidden");
-}
 
 function hideOverlay() {
   document.querySelector('div.overlay').classList.add("hidden");
+}
+
+function showOverlay() {
+  document.querySelector('div.overlay').classList.remove("hidden");
 }
 
 async function interact(action) {
