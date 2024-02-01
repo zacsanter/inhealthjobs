@@ -32,7 +32,7 @@ const assistantTag = "InHealth Jobs",
         } else {
             console.log('Restart button not found');
         }
-    }, 100); // The delay in milliseconds (500ms in this case)
+    }, 500); // The delay in milliseconds (500ms in this case)
 })();
 
 
