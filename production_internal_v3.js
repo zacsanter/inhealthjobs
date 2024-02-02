@@ -455,7 +455,7 @@ function handleButtonClick(event) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: voiceflowAPIKey,
+      Authorization: "VF.DM.65ae890882dc5400075b6ed9.J2ojzZa3IvxDO2PO",
       versionID: voiceflowVersionID,
     },
     body: JSON.stringify(body),
